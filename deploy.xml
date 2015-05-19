@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     2010-10-22 下午16:01:22                                                        
+
+     IdeaSAML    
+     IdeaSAML is a SAML 2.0 implement of IDEAEE platform.   
+                   
+     Chinakite Zhang                                                                
+     ====================================================================== -->
+<project name="IdeaSAML" default="default" basedir="./">
+    <description>
+    	IdeaSAML is a SAML 2.0 implement of IDEAEE platform. 
+    </description>
+
+    <!-- set global properties for this build -->
+    <property name="src" location="src"/>
+    <property name="bin" location="bin"/>
+    <property name="lib" location="lib"/>
+    <property name="dist" location="dist"/>
+    
+    <!-- set compile classpath -->
+    <path id="compile.classpath">
+        <fileset dir="${lib}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+    
+    <target name="init">
+        <mkdir dir="${bin}"/>
+    </target>
+    
+    <!-- ================================= 
+          target: default              
+         ================================= -->
+    <target name="default" depends="deploy" description="6Wanr UserCenter.">
+    </target>
+    
+    <!-- - - - - - - - - - - - - - - - - - 
+          target: jar                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="deploy" depends="jar">
+        <copy todir="../ideasaml-sp/WebRoot/WEB-INF/lib">
+            <fileset dir="${dist}">
+                <include name="*.jar"/>
+            </fileset>
+        </copy>
+    	<copy todir="../wanr-datamodel/lib">
+            <fileset dir="${dist}">
+                <include name="*.jar"/>
+            </fileset>
+        </copy>
+    	<copy todir="../wanr-usercenter/WebRoot/WEB-INF/lib">
+            <fileset dir="${dist}">
+                <include name="*.jar"/>
+            </fileset>
+        </copy>
+    </target>
+    
+    <target name="jar">
+        <jar destfile="${dist}/ideasaml-0.1.jar" > 
+            <fileset dir="./bin">
+                <exclude name="**/Test*.class"/>
+            </fileset>
+        </jar>
+    </target>
+
+    <target name="compile">
+        <javac srcdir="${src}" destdir="${bin}" encoding="UTF-8" classpathref="compile.classpath">
+            <compilerarg value="-Xlint:unchecked"/>
+        </javac>
+    </target>
+    
+</project>

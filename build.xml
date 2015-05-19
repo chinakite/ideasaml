@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     2010-10-22 下午16:01:22                                                        
+
+     IdeaSAML    
+     IdeaSAML is a SAML 2.0 implement of IDEAEE platform.
+                   
+     Chinakite Zhang                                                                
+     ====================================================================== -->
+<project name="IdeaSAML" default="default" basedir="./">
+    <description>
+        IdeaSAML is a SAML 2.0 implement of IDEAEE platform.
+    </description>
+
+    <!-- set global properties for this build -->
+    <property name="src" location="src"/>
+    <property name="test-src" location="test"/>
+    <property name="bin" location="bin"/>
+    <property name="lib" location="lib"/>
+    <property name="test-report" location="report/test"/>
+    
+    <!-- set compile classpath -->
+    <path id="compile.classpath">
+        <fileset dir="${lib}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+    
+    <target name="init">
+        <mkdir dir="${bin}"/>
+        <mkdir dir="${test-report}"/>
+    </target>
+    
+    <!-- ================================= 
+          target: default              
+         ================================= -->
+    <target name="default" depends="jar" description="IdeaJDBC is a SQL Mapping framework.">
+    </target>
+    
+    <!-- - - - - - - - - - - - - - - - - - 
+          target: jar                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="jar">
+        <jar destfile="dist/ideasaml-0.1.jar" > 
+            <fileset dir="./bin">
+                <exclude name="**/Test*.class"/>
+            </fileset>
+        </jar>
+    </target>
+
+    <target name="unit.test" depends="compile, compile.test">
+        <delete>
+            <fileset dir="report"></fileset>
+        </delete>
+        <junit fork="true" haltonerror="false" haltonfailure="false" printsummary="yes" outputtoformatters="true">
+            <classpath>
+                <path refid="compile.classpath"/>
+                <pathelement location="${bin}"/>
+            </classpath>
+            <formatter type="xml"/>
+            <batchtest todir="${test-report}">
+                <fileset dir="${bin}" includes="**/Test*.class"/>
+            </batchtest>
+        </junit>
+    </target>
+    
+    <target name="test.report" depends="init, delete.report, unit.test">
+        <mkdir dir="${test-report}/html"/>
+        <junitreport todir="${test-report}">
+            <fileset dir="${test-report}">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report todir="${test-report}/html"/>
+        </junitreport>
+    </target>
+        
+    <target name="delete.report">
+        <delete>
+            <fileset dir="${test-report}" includes="**/*.*"/>
+        </delete>
+    </target>
+    
+    <target name="compile">
+        <javac srcdir="${src}" destdir="${bin}" encoding="UTF-8" classpathref="compile.classpath">
+            <compilerarg value="-Xlint:unchecked"/>
+        </javac>
+    </target>
+    
+    <target name="compile.test">
+        <javac srcdir="${test-src}" destdir="${bin}" encoding="UTF-8" classpathref="compile.classpath">
+        </javac>
+        <copy file="${test-src}/ideajdbc.properties" todir="${bin}"/>
+    </target>
+</project>
