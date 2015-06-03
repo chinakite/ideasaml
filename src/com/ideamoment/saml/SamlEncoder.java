@@ -3,12 +3,8 @@
  */
 package com.ideamoment.saml;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.zip.Deflater;
-import java.util.zip.DeflaterOutputStream;
 
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -25,46 +21,35 @@ public class SamlEncoder {
     
     private static Logger logger = LoggerFactory.getLogger(SamlEncoder.class);
     
-    private String samlRequest;
-    private String samlResult;
+    private String samlInput;       //输入
+    private String samlResult;      //编码后的结果
     
-    public SamlEncoder(String samlRequest) {
-        this.samlRequest = samlRequest;
+    public SamlEncoder(String samlInput) {
+        this.samlInput = samlInput;
     }
     
     @SuppressWarnings("deprecation")
     public String encode(){
-        if(samlRequest == null){
+        return encode(true);
+    }
+    
+    public String encode(boolean urlEncoding) {
+        if(samlInput == null){
             return null;
         }
         
         try {
-            byte[] samlResponseByte = Base64.encodeBase64(samlRequest.getBytes());
-            samlResult = URLEncoder.encode(new String(samlResponseByte), "UTF-8");
+            byte[] samlResponseByte = Base64.encodeBase64(samlInput.getBytes());
+            samlResult = new String(samlResponseByte);
+            if(urlEncoding) {
+                samlResult = URLEncoder.encode(samlResult, "UTF-8");
+            }
+            return samlResult;
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-            samlRequest = null;
+            samlInput = null;
             logger.error(e.getMessage(), e);
         }
-        
-//        Deflater deflater = new Deflater(Deflater.DEFLATED, true);
-//        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//        DeflaterOutputStream deflaterOutputStream = new DeflaterOutputStream(
-//                byteArrayOutputStream, deflater);
-//        try {
-//            deflaterOutputStream.write(samlRequest.getBytes());
-//            deflaterOutputStream.close();
-//            Base64 base64encoder = new Base64();
-//            byte[] samlResponseByte = base64encoder.encode(byteArrayOutputStream.toByteArray());
-//            
-//            samlResult = URLEncoder.encode(new String(samlResponseByte), "UTF-8");
-//        } catch (IOException e) {
-//            samlRequest = null;
-//            logger.error(e.getMessage(), e);
-//            e.printStackTrace();
-//        }
         return samlResult;
     }
-    
-    
 }

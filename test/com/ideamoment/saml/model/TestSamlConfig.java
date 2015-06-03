@@ -15,5 +15,7 @@ public class TestSamlConfig {
     public void testGetRootKey() {
         SamlConfig.init();
         System.out.println(SamlConfig.getCertstr());
+        System.out.println(SamlConfig.getRootPrivateKey());
+        System.out.println(SamlConfig.getRootPublicKey());
     }
 }

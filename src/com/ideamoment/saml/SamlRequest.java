@@ -99,13 +99,13 @@ public class SamlRequest extends Saml {
         if(samlRequest == null){
             return false;
         }
-        SamlDecoder decoder = new SamlDecoder(samlRequest);
-        String samlXmlRequest = decoder.decode();
-        if(samlXmlRequest == null){
-            return false;
-        }
+//        SamlDecoder decoder = new SamlDecoder(samlRequest);
+//        String samlXmlRequest = decoder.decode();
+//        if(samlRequest == null){
+//            return false;
+//        }
         try {
-            AuthnRequest request = (AuthnRequest) readFromString(samlXmlRequest);
+            AuthnRequest request = (AuthnRequest) readFromString(samlRequest);
             
             issuerURL   = request.getIssuer().getValue();
             requestID   = request.getID();

@@ -63,7 +63,7 @@ import com.ideamoment.saml.xml.XmlPrettyPrinter;
  * @author Chinakite Zhang
  *
  */
-public abstract class Saml {
+public class Saml {
     private static Logger logger = LoggerFactory.getLogger(Saml.class);
     
     private DocumentBuilder builder;
@@ -446,5 +446,12 @@ public abstract class Saml {
         assertion.getStatements ().add (statement);
 
         return assertion;
+    }
+    
+    public static void main(String[] args) throws IOException, UnmarshallingException, SAXException {
+        Saml s = new Saml();
+        XMLObject xo = s.readFromFile("E:\\iWorkspace\\java\\ideasaml\\test\\test.xml");
+        
+        System.out.println(xo);
     }
 }

@@ -22,7 +22,6 @@ public interface SamlUser {
      * @return
      */ 
     public Serializable getId();
-    
     public void setId(Serializable id);
     
     /**
@@ -30,7 +29,6 @@ public interface SamlUser {
      * @return
      */
     public String getName();
-    
     public void setName(String name);
     
     /**
@@ -39,7 +37,6 @@ public interface SamlUser {
      * @return
      */
     public PrivateKey getPrivateKey();
-    
     public void setPrivateKey(PrivateKey privateKey);
     
     /**
@@ -48,7 +45,6 @@ public interface SamlUser {
      * @return
      */
     public String getPrivateKeyStr();
-    
     public void setPrivateKeyStr(String privateKeyStr);
     
     /**
@@ -57,7 +53,6 @@ public interface SamlUser {
      * @return
      */
     public PublicKey getPublicKey();
-    
     public void setPublicKey(PublicKey publicKey);
     
     /**
@@ -66,7 +61,6 @@ public interface SamlUser {
      * @return
      */
     public String getPublicKeyStr();
-    
     public void setPublicKeyStr(String publicKeyStr);
     
     /**
@@ -75,7 +69,6 @@ public interface SamlUser {
      * @return
      */
     public Certificate getCertificate();
-    
     public void setCertificate(Certificate certificate);
     
     /**
@@ -84,7 +77,6 @@ public interface SamlUser {
      * @return
      */
     public String getCertificateStr();
-    
     public void setCertificateStr(String certificateStr);
     
     /**
@@ -93,7 +85,6 @@ public interface SamlUser {
      * @return
      */
     public int getSamlNotBefore();
-    
     public void setSamlNotBefore(int samlNotBefore);
     
     /**
@@ -102,7 +93,6 @@ public interface SamlUser {
      * @return
      */
     public int getSamlNotAfter();
-    
     public void setSamlNotAfter(int samlNotAfter);
     
     /**
@@ -122,4 +112,19 @@ public interface SamlUser {
      * 读取字符串密钥信息
      */
     public void readKeyFromStr();
+    
+    /**
+     * 读取字符串公钥信息
+     */
+    public void readPublicKeyFromStr();
+    
+    /**
+     * 读取字符串公钥信息
+     */
+    public void readPrivateKeyFromStr();
+    
+    /**
+     * 读取字符串证书信息
+     */
+    public void readCertificateFromStr();
 }

@@ -7,10 +7,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
-import java.util.zip.ZipException;
 
 import org.apache.commons.codec.binary.Base64;
 import org.opensaml.common.SAMLException;
@@ -28,19 +28,23 @@ public class SamlDecoder {
     
     private static Logger logger = LoggerFactory.getLogger(SamlDecoder.class);
     
-    String samlRequest;
+    String samlInput;
     String samlResult;
     
-    public SamlDecoder(String samlRequest) {
+    public SamlDecoder(String samlInput) {
         super();
-        this.samlRequest = samlRequest;
+        this.samlInput = samlInput;
     }
     public String decode(){
-        if(samlRequest == null || samlRequest.equals("undefined")){
+        return decode(true);
+    }
+    
+    public String decode(boolean urlDecoding){
+        if(samlInput == null || samlInput.equals("undefined")){
             return null;
         }
         try {
-            samlResult = decodeAuthnRequestXML(samlRequest);
+            samlResult = decodeAuthnRequestXML(samlInput, urlDecoding);
         } catch (SAMLException e) {
             // TODO Auto-generated catch block
             logger.error(e.getMessage(), e);
@@ -51,6 +55,7 @@ public class SamlDecoder {
     }
     
     
+    
     /** (Based on the Google reference implementation, with some modifications suggested in the Google Api's group
     *  -Nate- to avoid buffer size problems in the original code) 
     * Retrieves the AuthnRequest from the encoded and compressed String extracted
@@ -58,30 +63,26 @@ public class SamlDecoder {
        * 1. URL decode <br> 2. Base64 decode <br> 3. Inflate <br> Returns the String
     * format of the AuthnRequest XML.
     * 
-    * @param encodedRequestXmlString the encoded request xml
+    * @param encodedString the encoded request xml
     * @return the string format of the authentication request XML.
     * 
     */
-    private String decodeAuthnRequestXML(String encodedRequestXmlString) 
+    private String decodeAuthnRequestXML(String encodedString, boolean urlDecoding) 
         throws SAMLException {
 //        String uncompressed = null; 
         try {
             // URL decode
             // No need to URL decode: auto decoded by request.getParameter() method
             // Base64 decode
+            if(urlDecoding) {
+                encodedString = URLDecoder.decode(encodedString, "UTF-8");
+            }
+            
             Base64 base64Decoder = new Base64();
-            byte[] xmlBytes = encodedRequestXmlString.getBytes("UTF-8");
+            byte[] xmlBytes = encodedString.getBytes("UTF-8");
             byte[] base64DecodedByteArray = base64Decoder.decode(xmlBytes);
      
             return new String(base64DecodedByteArray, "UTF-8");
-            
-            // Uncompress the AuthnRequest data using a stream decompressor, as suggested in discussions
-             // of the Google Apps Api's group.
-//             try {
-//                uncompressed = new String(inflate(base64DecodedByteArray, true)); 
-//            } catch (ZipException e) {
-//                uncompressed = new String(inflate(base64DecodedByteArray, false));
-//            }
         }catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             logger.error(e.getMessage(), e);

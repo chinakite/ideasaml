@@ -63,13 +63,26 @@ public class SamlResponse extends Saml {
     
     private static Logger logger = LoggerFactory.getLogger(SamlResponse.class);
     
+    private static String IDP_URL = "http://localhost:9080/wanr-usercenter/sso";
+    
     private String issuerURL;
     private String requestID;
     private String acsURL;
-    private static String IDP_URL = "http://localhost:9080/wanr-usercenter/sso";
+    private String sessionId;
     private String samlResponse;
     
     private SamlUser user;
+    
+    
+    public SamlResponse(SamlUser user, String issuerURL, String requestID,
+                        String acsURL, String sessionId) {
+        super();
+        this.user = user;
+        this.issuerURL = issuerURL;
+        this.requestID = requestID;
+        this.acsURL = acsURL;
+        this.sessionId = sessionId;
+    }
     
     public SamlResponse(SamlUser user, String issuerURL, String requestID,
                         String acsURL) {
@@ -89,9 +102,11 @@ public class SamlResponse extends Saml {
     public boolean generateAuthnResponse(){
         try {
             Assertion assertion = createStockAuthnAssertion();
-//            for(Map.Entry<String, Set<String>> entry : user.getUsergroup().entrySet()){
-//                addAttribution(assertion,entry.getKey(),new ArrayList(entry.getValue()));
-//            }
+            
+            List publicKeys = new ArrayList();
+            publicKeys.add(user.getPublicKeyStr());
+            addAttribution(assertion, "publicKey", publicKeys);
+            
             assertion = createAssertionSignatrue(assertion);
             samlResponse = showResponse(assertion);
             if(samlResponse != null){
@@ -248,17 +263,20 @@ public class SamlResponse extends Saml {
             List<String> publicKeys = readAttribution(assertion, "publicKey");
             if(publicKeys != null && publicKeys.size() > 0) {
                 user.setPublicKeyStr(publicKeys.get(0));
+                user.readPublicKeyFromStr();
             }
                     
             if(validateAssertionSignature(assertion) == false){
-                
+                throw new IdeaSamlException("Assertion signature is invalid.");
+            }
+            
+            List<String> sessionIds = readAttribution(assertion, "sessionId");
+            if(sessionIds != null && sessionIds.size() > 0) {
+                this.sessionId = sessionIds.get(0);
             }
             
             //List<String> usergroup = readAttribution(assertion, UserRole.USERGROUP_KEY);
             //returnuser.setUsergroup(usergroup);
-            Map<String, Set<String>> userattr = readAllAttribution(assertion);
-            returnuser.setUsergroup(userattr);
-            return returnuser;
         } catch (IOException e) {
             // TODO Auto-generated catch block
             logger.error(e.getMessage(), e); 
@@ -268,10 +286,6 @@ public class SamlResponse extends Saml {
             logger.error(e.getMessage(), e); 
             e.printStackTrace();
         } catch (SAXException e) {
-            // TODO Auto-generated catch block
-            logger.error(e.getMessage(), e); 
-            e.printStackTrace();
-        } catch (SAMLException e) {
             // TODO Auto-generated catch block
             logger.error(e.getMessage(), e); 
             e.printStackTrace();
@@ -318,5 +332,36 @@ public class SamlResponse extends Saml {
                 }
         }
         return result;
+    }
+    
+    private Assertion addAttribution(Assertion assertion, String key, List<String> values){
+        if(assertion == null || key == null ||values == null){
+            return null;
+        }
+        AttributeStatement statement = create (AttributeStatement.class, 
+                AttributeStatement.DEFAULT_ELEMENT_NAME);
+                
+        addAttribute (statement, key, values);
+        assertion.getStatements ().add (statement);
+        
+        return assertion;
+    }
+    
+    /**
+     * @return the user
+     */
+    public SamlUser getUser() {
+        return user;
+    }
+    
+    /**
+     * @param user the user to set
+     */
+    public void setUser(SamlUser user) {
+        this.user = user;
+    }
+    
+    public String getSessionId() {
+        return this.sessionId;
     }
 }
