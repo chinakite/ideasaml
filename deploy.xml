@@ -54,6 +54,11 @@
                 <include name="*.jar"/>
             </fileset>
         </copy>
+    	<copy todir="../ideasaml-idp/WebRoot/WEB-INF/lib">
+            <fileset dir="${dist}">
+                <include name="*.jar"/>
+            </fileset>
+        </copy>
     </target>
     
     <target name="jar">
